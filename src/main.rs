@@ -29,22 +29,30 @@ fn translate_building(original: &str) -> Option<&str> {
     }
 }
 
-fn translate_description(original: &str) -> Option<String> {
-    let information = original.split_once(",").unwrap().1.trim();
-    let information_split = information.split_once(",").unwrap();
+// All errors are parsing errors, I'm just too lazy to make a proper error type
+fn translate_description(original: &str) -> Result<String, ()> {
+    let Some(information) = original.split_once(',') else {
+        return Err(())
+    };
+    let information = information.1.trim();
+    let Some(information_split) = information.split_once(',') else {
+        return Err(())
+    };
 
     let class_type: String = information_split
         .0
         .chars()
-        .filter(|c| *c != '[' || *c != ']')
+        .filter(|c| *c != '[' && *c != ']')
         .collect();
+
     let professor = information_split.1.replace("taught by", "");
     let professor = professor.trim();
+    let Some(professor_split) = professor.split_once(", ") else {
+        return Err(())
+    };
+    let professor = format!("{} {}", professor_split.1, professor_split.0);
 
-    Some(format!(
-        "Class Type: {} | Professor: {}",
-        class_type, professor
-    ))
+    Ok(format!("Class Type: {class_type} | Professor: {professor}",))
 }
 
 fn main() -> ExitCode {
@@ -75,25 +83,34 @@ fn main() -> ExitCode {
             let mut new_event = event.clone();
 
             // Put the relevant course name at the beginning of the name of the course.
-            let summary_pieces = event.get_summary().unwrap().split_once(" ").unwrap();
-            new_event.summary(format!("{} {}", summary_pieces.1, summary_pieces.0).as_str());
+            if let Some(summary) = event.get_summary() {
+                if let Some((class_number, class_name)) = summary.split_once(' ') {
+                new_event.summary(format!("{} {}", class_name, class_number).as_str());
+                } else {
+                    eprintln!("Failed to parse summary data - reusing original.")
+                }
+            }
 
-            let og_building_pieces = event
-                .property_value("LOCATION")
-                .unwrap()
-                .split_once(",")
-                .unwrap();
-
-            let building = match translate_building(og_building_pieces.0) {
-                Some(b) => b,
-                None => og_building_pieces.0,
-            };
-            let new_room = og_building_pieces.1.replace("room", "");
-            let new_room = new_room.trim();
-            new_event.add_property("LOCATION", format!("{} {}", building, new_room));
+            if let Some(location) = event.property_value("LOCATION") {
+                if let Some((og_building, og_room)) = location.split_once(',') {
+                    let building = match translate_building(og_building) {
+                        Some(b) => b,
+                        None => og_building,
+                    };
+                    let new_room = og_room.replace("room", "");
+                    let new_room = new_room.trim();
+                    new_event.add_property("LOCATION", format!("{building} {new_room}"));
+                } else {
+                    eprintln!("Failed to parse location data - reusing original.")
+                }
+            }
 
             if let Some(description) = event.get_description() {
-                new_event.description(translate_description(description).unwrap().as_str());
+                if let Ok(new_description) = translate_description(description) {
+                    new_event.description(&new_description);
+                } else {
+                    eprintln!("Failed to parse description - reusing original.");
+                }
             }
 
             output_calendar.push(new_event);
@@ -101,7 +118,7 @@ fn main() -> ExitCode {
     }
 
     let mut output_file = File::create(output_filename).unwrap();
-    write!(output_file, "{}", output_calendar).unwrap();
+    write!(output_file, "{output_calendar}").unwrap();
 
     ExitCode::SUCCESS
 }
