@@ -22,3 +22,11 @@ cedarcal-fmt input_schedule.ics
 Note, the executable can also be accessed at `./target/release/cedarcal-fmt`.
 
 See `cedarcal-fmt --help` for more options.
+
+## Examples
+
+Original:
+![Original Example](images/original_example.png)
+
+Prettified
+![Prettified Example](images/prettified_example.png)
