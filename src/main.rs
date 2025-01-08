@@ -43,20 +43,27 @@ fn translate_description(original: &str) -> Result<String, ()> {
         return Err(())
     };
 
-    let class_type: String = information_split
-        .0
-        .chars()
-        .filter(|c| *c != '[' && *c != ']')
-        .collect();
+    let class_type = &information_split.0.trim()[1..information_split.0.len() - 1];
 
-    let professor = information_split.1.replace("taught by", "");
-    let professor = professor.trim();
-    let Some(professor_split) = professor.split_once(", ") else {
-        return Err(())
-    };
-    let professor = format!("{} {}", professor_split.1, professor_split.0);
+    let csv_profs = information_split.1.replace("taught by", "");
+    let csv_profs = csv_profs.trim();
+    let professor_split: Vec<_> = csv_profs.split(", ").collect();
 
-    Ok(format!("Class Type: {class_type} | Professor: {professor}",))
+    let mut professors = Vec::new();
+
+    for i in 0..professor_split.len() {
+        if i % 2 != 1 {
+            continue;
+        }
+
+        professors.push(format!("{} {}", professor_split.get(i).unwrap(), professor_split.get(i-1).unwrap()));
+    }
+
+    let professor_string = professors.join(", ");
+
+    Ok(format!(
+        "Class Type: {class_type} | Professor(s): {professor_string}"
+    ))
 }
 
 fn main() -> ExitCode {
