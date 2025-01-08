@@ -11,7 +11,7 @@ use icalendar::{Calendar, CalendarComponent, Component};
 struct Cli {
     input_file: String,
 
-    /// Output file.  Default: ./output.ics
+    /// Output file, defaults to ./output.ics
     #[arg(short, long)]
     output_file: Option<String>,
 }
