@@ -23,9 +23,9 @@ fn translate_building(original: &str) -> Option<&str> {
         "Ctr for Bib and Theo Studies" => Some("BTS"),
         "Milner" => Some("MIL"),
         "Scharnberg Bus and Comm Center" => Some("SBCC"),
-        "Callan Athletic Center" => Some("Callan"),
-        "Tyler Digital Comm Center" => Some("Tyler"),
-        "Apple Technology Resource Ctr" => Some("Apple"),
+        "Callan Athletic Center" => Some("CAL"),
+        "Tyler Digital Comm Center" => Some("TYL"),
+        "Apple Technology Resource Ctr" => Some("APP"),
         _ => {
             eprintln!("Unable to find acronym for building {original}.");
             None
@@ -89,7 +89,7 @@ fn main() -> ExitCode {
             // Put the relevant course name at the beginning of the name of the course.
             if let Some(summary) = event.get_summary() {
                 if let Some((class_number, class_name)) = summary.split_once(' ') {
-                new_event.summary(format!("{class_name} {class_number}").as_str());
+                    new_event.summary(format!("{class_name} {class_number}").as_str());
                 } else {
                     eprintln!("Failed to parse summary data - reusing original.");
                 }
