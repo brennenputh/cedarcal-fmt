@@ -55,8 +55,10 @@ fn translate_description(original: &str) -> Result<String, ()> {
         if i % 2 != 1 {
             continue;
         }
+        let first = professor_split.get(i).expect("Failed to parse professor's first name.");
+        let second = professor_split.get(i - 1).expect("Failed to parse professor's last name.");
 
-        professors.push(format!("{} {}", professor_split.get(i).unwrap(), professor_split.get(i-1).unwrap()));
+        professors.push(format!("{first} {second}"));
     }
 
     let professor_string = professors.join(", ");
@@ -72,7 +74,7 @@ fn main() -> ExitCode {
     let input_filename = cli.input_file;
     let output_filename = match cli.output_file {
         Some(f) => f,
-        None => "./output.ics".to_string(),
+        None => String::from("./output.ics"),
     };
 
     let input_contents = match read_to_string(input_filename) {
@@ -128,8 +130,14 @@ fn main() -> ExitCode {
         }
     }
 
-    let mut output_file = File::create(output_filename).unwrap();
-    write!(output_file, "{output_calendar}").unwrap();
+    let Ok(mut output_file) = File::create(output_filename) else {
+        eprintln!("Failed to open output file.");
+        return ExitCode::FAILURE;
+    };
+    if let Err(e) = write!(output_file, "{output_calendar}") {
+        eprintln!("Could not write to output file: {e}");
+        return ExitCode::FAILURE;
+    };
 
     ExitCode::SUCCESS
 }
