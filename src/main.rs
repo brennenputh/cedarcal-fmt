@@ -108,7 +108,10 @@ fn main() -> ExitCode {
                 if let Some((og_building, og_room)) = location.split_once(',') {
                     let building = match translate_building(og_building) {
                         Some(b) => b,
-                        None => og_building,
+                        None => {
+                            eprintln!("Failed to translate building name - reusing original.");
+                            og_building
+                        },
                     };
                     let new_room = og_room.replace("room", "");
                     let new_room = new_room.trim();
