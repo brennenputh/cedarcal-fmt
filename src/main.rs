@@ -36,11 +36,11 @@ fn translate_building(original: &str) -> Option<&str> {
 // All errors are parsing errors, I'm just too lazy to make a proper error type
 fn translate_description(original: &str) -> Result<String, ()> {
     let Some(information) = original.split_once(',') else {
-        return Err(())
+        return Err(());
     };
     let information = information.1.trim();
     let Some(information_split) = information.split_once(',') else {
-        return Err(())
+        return Err(());
     };
 
     let class_type = &information_split.0.trim()[1..information_split.0.len() - 1];
@@ -90,8 +90,8 @@ fn main() -> ExitCode {
     };
 
     let Ok(input_calendar): Result<Calendar, _> = input_contents.parse() else {
-            eprintln!("Could not parse ICS file.");
-            return ExitCode::FAILURE;
+        eprintln!("Could not parse ICS file.");
+        return ExitCode::FAILURE;
     };
     let mut output_calendar = Calendar::new();
 
