@@ -55,8 +55,12 @@ fn translate_description(original: &str) -> Result<String, ()> {
         if i % 2 != 1 {
             continue;
         }
-        let first = professor_split.get(i).expect("Failed to parse professor's first name.");
-        let second = professor_split.get(i - 1).expect("Failed to parse professor's last name.");
+        let first = professor_split
+            .get(i)
+            .expect("Failed to parse professor's first name.");
+        let second = professor_split
+            .get(i - 1)
+            .expect("Failed to parse professor's last name.");
 
         professors.push(format!("{first} {second}"));
     }
@@ -111,7 +115,7 @@ fn main() -> ExitCode {
                         None => {
                             eprintln!("Failed to translate building name - reusing original.");
                             og_building
-                        },
+                        }
                     };
                     let new_room = og_room.replace("room", "");
                     let new_room = new_room.trim();
