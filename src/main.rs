@@ -76,10 +76,7 @@ fn main() -> ExitCode {
     let cli = Cli::parse();
 
     let input_filename = cli.input_file;
-    let output_filename = match cli.output_file {
-        Some(f) => f,
-        None => String::from("./output.ics"),
-    };
+    let output_filename = cli.output_file.unwrap_or(String::from("./output.ics"));
 
     let input_contents = match read_to_string(input_filename) {
         Ok(c) => c,
@@ -110,12 +107,9 @@ fn main() -> ExitCode {
 
             if let Some(location) = event.property_value("LOCATION") {
                 if let Some((og_building, og_room)) = location.split_once(',') {
-                    let building = match translate_building(og_building) {
-                        Some(b) => b,
-                        None => {
-                            eprintln!("Failed to translate building name - reusing original.");
-                            og_building
-                        }
+                    let building = if let Some(b) = translate_building(og_building) { b } else {
+                        eprintln!("Failed to translate building name - reusing original.");
+                        og_building
                     };
                     let new_room = og_room.replace("room", "");
                     let new_room = new_room.trim();
