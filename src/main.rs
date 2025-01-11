@@ -101,7 +101,6 @@ fn main() -> ExitCode {
         if let CalendarComponent::Event(event) = component {
             let mut new_event = event.clone();
 
-            // Put the relevant course name at the beginning of the name of the course.
             if let Some(summary) = event.get_summary() {
                 if let Some((class_number, class_name)) = summary.split_once(' ') {
                     new_event.summary(format!("{class_name} {class_number}").as_str());
