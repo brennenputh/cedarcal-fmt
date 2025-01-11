@@ -92,6 +92,8 @@ fn main() -> ExitCode {
     };
     let mut output_calendar = Calendar::new();
 
+    // There is another calendar download location, which does not have the nice recurring events.
+    // Perhaps it would be wise to support it in the future, but at this moment it is a difficulty.
     if input_calendar.components.len() > 50 {
         eprintln!("Calendar type unsupported.  Please download your calendar from https://mycu.cedarville.edu/task/all/download-class-schedule-calendar and try again.");
         return ExitCode::FAILURE;
