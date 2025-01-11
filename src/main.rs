@@ -26,6 +26,9 @@ fn translate_building(original: &str) -> Option<&str> {
         "Callan Athletic Center" => Some("CAL"),
         "Tyler Digital Comm Center" => Some("TYL"),
         "Apple Technology Resource Ctr" => Some("APP"),
+        "Dixon Ministry Center" => Some("DMC"),
+        "Williams Hall" => Some("Williams"),
+        "Chemistry Lab Center" => Some("CLC"),
         _ => {
             eprintln!("Unable to find acronym for building {original}.");
             None
