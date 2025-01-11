@@ -92,6 +92,11 @@ fn main() -> ExitCode {
     };
     let mut output_calendar = Calendar::new();
 
+    if input_calendar.components.len() > 50 {
+        eprintln!("Calendar type unsupported.  Please download your calendar from https://mycu.cedarville.edu/task/all/download-class-schedule-calendar and try again.");
+        return ExitCode::FAILURE;
+    }
+
     for component in &input_calendar.components {
         if let CalendarComponent::Event(event) = component {
             let mut new_event = event.clone();
@@ -107,7 +112,9 @@ fn main() -> ExitCode {
 
             if let Some(location) = event.property_value("LOCATION") {
                 if let Some((og_building, og_room)) = location.split_once(',') {
-                    let building = if let Some(b) = translate_building(og_building) { b } else {
+                    let building = if let Some(b) = translate_building(og_building) {
+                        b
+                    } else {
                         eprintln!("Failed to translate building name - reusing original.");
                         og_building
                     };
